@@ -1,34 +1,48 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import  { useEffect, useState } from 'react'
+import { fetchCards, type CardType } from './Cars'
+import Card from './Card'
 
-function App() {
-  const [count, setCount] = useState(0)
 
+
+
+const App = () => {
+
+ const [cards,setCards] = useState<CardType[]>([])
+
+ const [currentCard, setCurrentCard] = useState<CardType>()
+ 
+ const [index, setIndex] = useState<number>(-3)
+
+ const [cardclass, setcardclass] = useState<string>("CardFront")
+
+ useEffect(()=>{
+    fetchCards().then(data => {
+      setCards(data)
+    } )
+  },[])
+
+  useEffect(() =>{
+    PullCard()
+  }, [cards])
+
+const PullCard = () =>{
+  if(index == 12)
+    setIndex(0)
+  else
+    setIndex(perv =>perv+1)
+  setcardclass("CardFront")
+  setCurrentCard(cards[index])
+}
+const FlipCard = () =>{
+  setcardclass("CardBack")
+}
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <div className='Main'> 
+      {currentCard && <Card cardclass={cardclass} card={currentCard} pullCard={PullCard} flipCard={FlipCard} ></Card>}
+
+      <p>{index} / 12</p>
+      <progress className='ProgressBar' value={index} max={12} />
+    </div>
   )
 }
 
